@@ -103,19 +103,20 @@ fileConversion <- function(x){
 }
 
 #' @title Data conversion function
-#' @description The internal data conversion function to bring data in the right json format. In case the uploaded file is a s4 class object, the object is converted to a binary s4 object.
+#' @description The internal data conversion function to bring data in the right json format. In case the uploaded file is a s4 class object, the object is converted to a binary s4 object. May do limited download.
 #' @param projectURL The firebase database url. {string}
 #' @param fileName The filename or subdirectory. {string}
 #' @param secretKey The optional database secret key for admin access. {string}
 #' @param token The user access token that can be retrieved with the auth() function. Required when if the database rules specify the need for user authentications. {string}
 #' @param isClass In case a s4 class object is downloaded, fireData expects a isClass=TRUE
+#' @param isShallow Request shallow data to avoid full download.
 #' @return returns optionally reformatted data.
 #' @export
 #' @examples
 #' \dontrun{
 #' download(projectURL = "https://firedata-b0e54.firebaseio.com/", fileName = "main/-KxwWNTVdplXFRZwGMkH")
 #' }
-download <- function(projectURL, fileName, secretKey = "none", token = "none", isClass = FALSE) {
+download <- function(projectURL, fileName, secretKey = "none", token = "none", isClass = FALSE, isShallow=FALSE) {
 
   if (secretKey == "none" && token == "none") {
     urlPath = paste0(projectURL,"/",fileName,".json")
@@ -124,7 +125,14 @@ download <- function(projectURL, fileName, secretKey = "none", token = "none", i
   } else {
     urlPath = paste0(projectURL,"/",fileName,".json?auth=",secretKey)
   }
-
+  
+  if (isShallow) {
+    if(!grepl('?', urlPath, fixed=T)) {
+      urlPath = paste0(urlPath, "?")
+    }
+    urlPath = paste0(urlPath, "&shallow=true")
+  }
+  
   data = httr::GET(urlPath)
 
   if (is.null(jsonlite::fromJSON(httr::content(data,"text")))) warning("No data found at database location.")
