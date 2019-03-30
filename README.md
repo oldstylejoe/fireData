@@ -1,3 +1,7 @@
+# Edits
+
+The option to only to do a 'shallow' download has been added to the download function. Just set 'isShallow' to True, and it will only download the next level of data. After that, you can construct the next level of keys, rinse, and repeat.
+
 ![fireData](http://frapbot.kohze.com/fireData/topImage6.jpg)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Kohze/fireData/master/LICENSE.txt)
