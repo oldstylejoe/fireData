@@ -110,13 +110,14 @@ fileConversion <- function(x){
 #' @param token The user access token that can be retrieved with the auth() function. Required when if the database rules specify the need for user authentications. {string}
 #' @param isClass In case a s4 class object is downloaded, fireData expects a isClass=TRUE
 #' @param isShallow Request shallow data to avoid full download.
+#' @param rawJSON bool to request the only the raw json string be returned (parse it yourself).
 #' @return returns optionally reformatted data.
 #' @export
 #' @examples
 #' \dontrun{
 #' download(projectURL = "https://firedata-b0e54.firebaseio.com/", fileName = "main/-KxwWNTVdplXFRZwGMkH")
 #' }
-download <- function(projectURL, fileName, secretKey = "none", token = "none", isClass = FALSE, isShallow=FALSE) {
+download <- function(projectURL, fileName, secretKey = "none", token = "none", isClass = FALSE, isShallow=FALSE, rawJSON=FALSE) {
 
   if (secretKey == "none" && token == "none") {
     urlPath = paste0(projectURL,"/",fileName,".json")
@@ -142,7 +143,11 @@ download <- function(projectURL, fileName, secretKey = "none", token = "none", i
     writeBin(jsonlite::base64_dec(jsonlite::fromJSON(retrievedData)), tempPath)
     return(readRDS(tempPath))
   } else {
-    return(jsonlite::fromJSON(httr::content(data,"text")))
+    if(rawJSON) {
+      return(httr::content(data,"text"))
+    } else {
+      return(jsonlite::fromJSON(httr::content(data,"text")))
+    }
   }
 }
 
